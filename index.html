@@ -433,23 +433,76 @@ $$
 
 
 Выходные значения:
- * Растры коэффициентов $c_1$, $c_2$, ..., $c_n$.
+ * Растры коэффициентов `$$c_1, c_2, \dots, c_n.$$`
  * Растры отфильтрованных результатов ("очищенные" растры). 
 
 ---
 # Установка модуля
 
+### Необходимые в системе программы и библиотеки:
+
+ * GRASS GIS 7
+ * Библиотека SciPy для Python
+ * Модуль GRASS r.mregression.series (доступен в addons)
+
+
+### Установка
+
+Модули доступны в GRASS addons, поэтому установка производится стандартными средствами 
+через модуль g.extension
+
+1. Установить r.mregression.series:
+```bash
+g.extension extension=r.mregression.series operation=add
+```
+2. Установить r.series.decompose: 
+```bash
+g.extension extension=r.series.decompose operation=add
+```
+
+
 ---
 # Параметры запуска
+
+```bash
+ r.series.decompose input=string[,string,...] result_prefix=string coef_prefix=string 
+   timevar_prefix=string freq=value[,value,...] [--overwrite] [--help] [--verbose] [--quiet] [--ui]
+```
+
+* input список имен анализируемых растров.
+* result_prefix префикс для имен результатов -- очищеных от шумов растров.
+* coef_prefix префикс для имен растров с коэффициентами.
+* timevar_prefix префикс для имен растров с объясняющими переменными (зависящими от времени). 
+* freq список частот используемых гармоник.
+
+
+**Последовательность действий**
+1. Составить список анализируемых карт. Карты должны быть через равные временные интервалы. Если
+это не так, то нужно вставить пустые растры (NULL).
+2. Если в анализируемых растрах есть облака и тени, то лучше их эти области заполнить значением "нет данных"
+(NULL).
+3. Определиться с числом гармоник и их составом. (Обычно гармоники кратны числу сезонов).
+
+
+```bash
+r.series.decompose input=raster1,raster2,raster3,... \
+	coef_prefix="coef." timevar_prefix="dec." result_pref="res." freq=3,6,9
+```
 
 ---
 # Результаты
 
+Наиболее важные генерируемые данные:
 
-----
+* Отфильтрованные растры res.raster1, res.raster2, res.raster3, ...
+* **Растры коэффициентов:**  coef.const, coef.cos_fr3, coef.cos_fr3, coef.cos_fr6, coef.sin_fr6, coef.sin_fr9, coef.sin_fr9, coef.time
+
+
+
+---
 # Особенности работы
 
---
+---
 
 # Выводы и планы на будущее
 
